@@ -1,0 +1,53 @@
+# Desc: 2 create robots with laser and sonar
+# zjb Spring 2012
+
+# defines Pioneer-like robots
+include "pioneer.inc"
+
+# defines 'map' object used for floorplans
+include "map.inc"
+
+# defines hokuyo laser
+include "hokuyo.inc"
+
+# size of the world in meters
+size [10 10]
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+
+# configure the GUI window
+window
+(
+  size [ 591.000 638.000 ]
+  center [-0.010 -0.040]
+  scale 35.7
+)
+
+# load an environment bitmap
+floorplan
+(
+  bitmap "bitmaps/cave.png"
+  size [16 16 0.8]
+  name "cave"
+)
+
+# create a robot
+pioneer2dx_base_front_sonar
+(
+  name "robot1"
+  pose [-7 2 0 45]
+  hokuyolaser( fov 240.0 samples 681 )
+  ctrl "wander"
+)
+
+# create a robot
+pioneer2dx_base_front_sonar
+(
+  name "robot2"
+  pose [3 -6 0 135]
+  hokuyolaser( fov 240.0 samples 681 )
+#  ctrl "wander"
+)
+ 
+

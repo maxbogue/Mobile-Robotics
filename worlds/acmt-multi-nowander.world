@@ -1,0 +1,66 @@
+# defines Pioneer-like robots
+include "irobot.inc"
+
+# defines 'map' object used for floorplans
+include "map.inc"
+
+# defines hokuyo laser
+include "hokuyo.inc"
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+
+# configure the GUI window
+window
+(
+  size [ 1020 630 ]
+  center [0 0]
+  scale 50.0
+)
+
+# load an environment bitmap
+# the image is 680 x 420 at 2 cm/pixel
+floorplan
+(
+  bitmap "acmt1.png"
+  size [13.6 8.4 1]
+  name "acmt"
+)
+
+# create a robot
+create
+(
+  name "robot1"
+  pose [0 0 0 0]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+create
+(
+  name "robot2"
+  pose [-6.1 -1 0 -90]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+create
+(
+  name "robot3"
+  pose [5.8 -2.0 0 -90]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+create
+(
+  name "robot4"
+  pose [6.2 1 0 90]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+create
+(
+  name "robot5"
+  pose [0 2.8 0 0]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+ 
