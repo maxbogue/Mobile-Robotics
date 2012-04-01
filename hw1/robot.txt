@@ -1,0 +1,26 @@
+Name: Max Bogue
+Robot: AquaJelly
+URL: http://www.festo.com/net/SupportPortal/Downloads/42072/AquaJelly_en.pdf
+
+Sensors:
+
+Pressure - water depth to within a few millimeters.
+Radio - communicates the use of the charging station with other AquaJellies.
+Light - to observe the position of other AquaJellies to evade.
+Internal - energy levels to decide when to go back to a charging station,
+           and the orientation of the propulsion system.
+
+Actuators:
+
+8 blue and 8 white LEDs (or 11 infrared? Conflicting info in the doc...) for
+communication with other AquaJellies and 8 tentacles for propulsion.  Also
+radio for other communications.
+
+Tasks:
+
+Survive.  The AquaJellies are designed to exist in a large basin with other
+AquaJellies, evading them until their battery runs low, when they seek out a
+charging station.
+
+The AquaJelly is fairly useless as-is for any other purpose, but the design
+could be adapted to various underwater surveillance tasks.
