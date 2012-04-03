@@ -14,11 +14,32 @@ class Point {
 public:
     double x, y;
     Point(double x, double y) : x(x), y(y) {}
+    double d() {
+        return sqrt(x * x + y * y);
+    }
+    double a() {
+        return atan2(y, x);
+    }
 };
 
 ostream& operator<<(ostream &strm, const Point &p) {
-    strm << "(" << p.x << ", " << p.y << ")";
-    return strm;
+    return strm << "(" << p.x << ", " << p.y << ")";
+}
+
+Point operator+(const Point &p1, const Point &p2) {
+    return Point(p1.x + p2.x, p1.y + p2.y);
+}
+
+Point operator-(const Point &p1, const Point &p2) {
+    return Point(p1.x - p2.x, p1.y - p2.y);
+}
+
+Point operator*(const Point &p, double s) {
+    return Point(p.x * s, p.y * s);
+}
+
+Point operator*(double s, const Point &p) {
+    return Point(p.x * s, p.y * s);
 }
 
 double distance(double x1, double y1, double x2, double y2) {
@@ -46,23 +67,22 @@ Point laserToPoint(int i, double d) {
     return Point(cos(a) * d, sin(a) * d);
 }
 
-vector<Point> localMinima(double rd[]) {
+vector< pair<double,int> > localMinima(double rd[]) {
     pair<double,int> last(rd[0], 0);
     bool newMin = true;
-    vector<Point> localMins;
+    vector< pair<double,int> > localMins;
     for (int i = 1; i < SAMPLE_POINTS; i++) {
         if (rd[i] > last.first) {
             if (newMin) {
-                localMins.push_back(laserToPoint(last.second, last.first));
+                localMins.push_back(last);
                 newMin = false;
-            } else {
-                last = pair<double,int>(rd[i], i);
             }
         } else {
-            last = pair<double,int>(rd[i], i);
             newMin = true;
         }
+        last = pair<double,int>(rd[i], i);
     }
+    if (newMin) localMins.push_back(last);
     return localMins;
 }
 
@@ -120,25 +140,39 @@ int main(int argc, char *argv[]) {
             }
         }
         
+        const double Kg = 1.0;
+        const double Ko = 5.0;
+        
         sampleData(rp, rangerData);
-        vector<Point> mins = localMinima(rangerData);
-        for (int i = 0; i < mins.size(); i++) {
-            cout << mins[i] << ", ";
-        }
+        vector< pair<double,int> > objects = localMinima(rangerData);
+        Point v = Point(xt, yt) - Point(x, y);
+        v = Point(v.x * cos(v.a() - a), v.y * sin(v.a() - a));
         cout << endl;
+        cout << v << endl;
+        v = v * (0.5 * min(d * d, 25.0));
+        cout << v << endl;
+        for (int i = 0; i < objects.size(); i++) {
+            Point o = laserToPoint(objects[i].second, objects[i].first);
+            cout << o << " -> ";
+            o = o * (Ko / pow(o.d(), 2));
+            cout << o << endl;
+            v = v + o;
+        }
+        cout << v << endl;
         
         double speed = 0;
-        double at = angle(x, y, xt, yt);
-        double turn = at - a;
+        double turn = v.a();
+        cout << turn << endl;
+        cout << v.d() << endl;
         
         // Turn the smaller direction.
         if (turn > PI) turn = 2 * PI - turn;
         if (turn < -PI) turn = 2 * PI + turn;
         
-        // If we're with 90 degrees of the angle, go!
-        if (abs(turn) < PI / 2) speed = d;
+        // If we're within 45 degrees of the angle, go!
+        if (abs(turn) < PI / 4) speed = min(0.5, v.d());
         
-        pp.SetSpeed(min(0.5, speed), turn);
+        pp.SetSpeed(speed, turn);
         
     }
 }
