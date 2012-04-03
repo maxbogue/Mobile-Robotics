@@ -3,38 +3,40 @@
 #include <iostream>
 #include <libplayerc++/playerc++.h>
 
-const double PI = std::atan(1.0) * 4;
-const double MIN_DISTANCE = 0.01;
+using namespace std;
+
+const double PI = atan(1.0) * 4;
+const double MIN_DISTANCE = 0.02;
+const int SAMPLE_POINTS = 64;
+const int SAMPLE_SIZE = 8;
 
 double distance(double x1, double y1, double x2, double y2) {
-    using namespace std;
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
 double angle(double x1, double y1, double x2, double y2) {
-    using namespace std;
     return atan2(y2 - y1, x2 - x1);
 }
 
 int main(int argc, char *argv[]) {
-    using namespace PlayerCc;
     char* host = "localhost";
     int port = 9001;
-    std::cout << argc << std::endl;
+    
     if (argc > 2) {
         host = argv[2];
         port = atoi(argv[3]);
     }
     
-    PlayerClient    robot(host, port);
-    Position2dProxy pp(&robot, 0);
+    PlayerCc::PlayerClient    robot(host, port);
+    PlayerCc::RangerProxy     rp(&robot, 0);
+    PlayerCc::Position2dProxy pp(&robot, 0);
     
-    std::cout << "Instantiated proxies" << std::endl;
+    cout << "Instantiated proxies." << endl;
     
-    std::ifstream ifs(argv[1]);
+    ifstream ifs(argv[1]);
     if (!ifs.is_open()) {
-        std::cout << "Waypoint file \"" << argv[1]
-                  << "\" not found." << std::endl;
+        cout << "Waypoint file \"" << argv[1]
+                  << "\" not found." << endl;
         return 1;
     }
     
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
     ifs >> xt;
     ifs >> yt;
     
-    std::cout << "First waypoint: " << xt << ", " << yt << std::endl;
+    cout << "First waypoint: " << xt << ", " << yt << endl;
     
     for (;;) {
         
@@ -51,7 +53,7 @@ int main(int argc, char *argv[]) {
         double y = pp.GetYPos();
         double a = pp.GetYaw();
         
-        std::cout << x << ", " << y << ", " << a / PI << std::endl;
+        // cout << x << ", " << y << ", " << a / PI << endl;
         
         double d = distance(x, y, xt, yt);
         
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
             if (!ifs.eof()) {
                 ifs >> xt;
                 ifs >> yt;
-                std::cout << "New waypoint: " << xt << ", " << yt << std::endl;
+                cout << "New waypoint: " << xt << ", " << yt << endl;
             } else {
                 break;
             }
