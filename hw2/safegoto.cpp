@@ -7,9 +7,11 @@ using namespace std;
 
 const double PI = atan(1.0) * 4;
 const double MIN_DISTANCE = 0.02;
-const int SAMPLE_POINTS = 64;
+const int SAMPLE_POINTS = 681 / 8;
 const int SAMPLE_SIZE = 8;
 
+// This class would be called Vector, but C++ is stupid and
+// calls its lists vectors, so I guess I'll go with Point.
 class Point {
 public:
     double x, y;
@@ -20,7 +22,14 @@ public:
     double a() {
         return atan2(y, x);
     }
+    Point rotate(double da) {
+        double ang = a() - da;
+        double dis = d();
+        return Point(dis * cos(ang), dis * sin(ang));
+    }
 };
+
+// Operator overloading so I can treat these things like real vectors.
 
 ostream& operator<<(ostream &strm, const Point &p) {
     return strm << "(" << p.x << ", " << p.y << ")";
@@ -50,11 +59,12 @@ double angle(double x1, double y1, double x2, double y2) {
     return atan2(y2 - y1, x2 - x1);
 }
 
+// Samples the ranger data down to SAMPLE_POINTS number of points
+// by averaging over SAMPLE_SIZE number of original points for each.
 void sampleData(PlayerCc::RangerProxy &rp, double rd[]) {
-    int START = rp.GetRangeCount() / 2 - SAMPLE_POINTS * SAMPLE_SIZE / 2;
     for (int i = 0; i < SAMPLE_POINTS; i++) {
         rd[i] = 0;
-        int groupStart = START + i * SAMPLE_SIZE;
+        int groupStart = i * SAMPLE_SIZE;
         for (int j = groupStart; j < groupStart + SAMPLE_SIZE; j++) {
             rd[i] += rp[j];
         }
@@ -63,7 +73,7 @@ void sampleData(PlayerCc::RangerProxy &rp, double rd[]) {
 }
 
 Point laserToPoint(int i, double d) {
-    double a = (0.5 - (double)i / SAMPLE_POINTS) * PI;
+    double a = 2 * i * PI * SAMPLE_SIZE / 1024 - 2 * PI / 3;
     return Point(cos(a) * d, sin(a) * d);
 }
 
@@ -105,7 +115,7 @@ int main(int argc, char *argv[]) {
     ifstream ifs(argv[1]);
     if (!ifs.is_open()) {
         cout << "Waypoint file \"" << argv[1]
-                  << "\" not found." << endl;
+             << "\" not found." << endl;
         return 1;
     }
     
@@ -141,22 +151,24 @@ int main(int argc, char *argv[]) {
         }
         
         const double Kg = 1.0;
-        const double Ko = 5.0;
+        const double Ko = 1.0;
         
         sampleData(rp, rangerData);
         vector< pair<double,int> > objects = localMinima(rangerData);
-        Point v = Point(xt, yt) - Point(x, y);
-        v = Point(v.x * cos(v.a() - a), v.y * sin(v.a() - a));
+        Point v = Point(xt - x, yt - y).rotate(a);
         cout << endl;
         cout << v << endl;
-        v = v * (0.5 * min(d * d, 25.0));
+        v = v * (0.5 * d);
         cout << v << endl;
         for (int i = 0; i < objects.size(); i++) {
-            Point o = laserToPoint(objects[i].second, objects[i].first);
-            cout << o << " -> ";
-            o = o * (Ko / pow(o.d(), 2));
-            cout << o << endl;
-            v = v + o;
+            if (objects[i].first > 0) {
+                cout << objects[i].first << " | " << objects[i].second << endl;
+                Point o = laserToPoint(objects[i].second, objects[i].first);
+                cout << o << " -> ";
+                o = o * (Ko / pow(o.d(), 2));
+                cout << o << endl;
+                v = v - o;
+            }
         }
         cout << v << endl;
         
