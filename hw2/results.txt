@@ -1,0 +1,11 @@
+After 5+ hours of fiddling with things and trying to figure out why my robot
+still loves to run into walls, I've had no luck.  I got it to the first
+waypoint once, but then discovered that it would only dodge things on the
+left.  I can only assume I'm screwing something up with the conversion from
+sensor data into local-coordinates, but I haven't the slightest idea what.
+
+I think my local minima algorithm is correct, but I would always get 4+ hits,
+which was always more than expected.  I didn't know what sort of function to
+use for the constants in the equation, because everything I tried (quadratic,
+linear, with difference scalars) failed pretty miserably.  Not the most fun
+or productive learning experience.
