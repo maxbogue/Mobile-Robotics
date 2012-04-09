@@ -7,8 +7,8 @@ using namespace std;
 
 const double PI = atan(1.0) * 4;
 const double MIN_DISTANCE = 0.02;
-const int SAMPLE_POINTS = 681 / 8;
-const int SAMPLE_SIZE = 8;
+const int SAMPLE_POINTS = 16;
+const int SAMPLE_SIZE = 681 / SAMPLE_POINTS;
 
 // This class would be called Vector, but C++ is stupid and
 // calls its lists vectors, so I guess I'll go with Point.
@@ -73,8 +73,9 @@ void sampleData(PlayerCc::RangerProxy &rp, double rd[]) {
 }
 
 Point laserToPoint(int i, double d) {
-    double a = 2 * i * PI * SAMPLE_SIZE / 1024 - 2 * PI / 3;
-    return Point(cos(a) * d, sin(a) * d);
+    double inc = 4.0 * PI / 3 / SAMPLE_POINTS;
+    double ang = (i + 0.5) * inc - 2.0 * PI / 3;
+    return Point(cos(ang) * d, sin(ang) * d);
 }
 
 vector< pair<double,int> > localMinima(double rd[]) {
