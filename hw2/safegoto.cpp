@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
         Point v = Point(xt - x, yt - y).rotate(a);
         cout << endl;
         cout << v << endl;
-        v = v * (0.5 * d);
+        v = v * (Kg / v.d());
         cout << v << endl;
         for (int i = 0; i < objects.size(); i++) {
             if (objects[i].first > 0) {
