@@ -151,8 +151,8 @@ int main(int argc, char *argv[]) {
             }
         }
         
-        const double Kg = 1.0;
-        const double Ko = 1.0;
+        const double Kg = 3.0;
+        const double Ko = 7.0;
         
         sampleData(rp, rangerData);
         vector< pair<double,int> > objects = localMinima(rangerData);
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
                 cout << objects[i].first << " | " << objects[i].second << endl;
                 Point o = laserToPoint(objects[i].second, objects[i].first);
                 cout << o << " -> ";
-                o = o * (Ko / pow(o.d(), 2));
+                o = o * (Ko / pow(o.d(), 3));
                 cout << o << endl;
                 v = v - o;
             }
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
         cout << v << endl;
         
         double speed = 0;
-        double turn = v.a();
+        double turn = v.a() / 5;
         cout << turn << endl;
         cout << v.d() << endl;
         
