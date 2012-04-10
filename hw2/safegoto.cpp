@@ -7,48 +7,51 @@ using namespace std;
 
 const double PI = atan(1.0) * 4;
 const double MIN_DISTANCE = 0.02;
-const int SAMPLE_POINTS = 16;
+const int SAMPLE_POINTS = 40;
 const int SAMPLE_SIZE = 681 / SAMPLE_POINTS;
 
-// This class would be called Vector, but C++ is stupid and
-// calls its lists vectors, so I guess I'll go with Point.
-class Point {
+class Vector {
 public:
     double x, y;
-    Point(double x, double y) : x(x), y(y) {}
+    Vector(double x, double y) : x(x), y(y) {}
     double d() {
         return sqrt(x * x + y * y);
     }
     double a() {
         return atan2(y, x);
     }
-    Point rotate(double da) {
+    Vector rotate(double da) {
         double ang = a() - da;
         double dis = d();
-        return Point(dis * cos(ang), dis * sin(ang));
+        return Vector(dis * cos(ang), dis * sin(ang));
     }
+};
+
+struct RangerData {
+    double d;
+    double a;
 };
 
 // Operator overloading so I can treat these things like real vectors.
 
-ostream& operator<<(ostream &strm, const Point &p) {
+ostream& operator<<(ostream &strm, const Vector &p) {
     return strm << "(" << p.x << ", " << p.y << ")";
 }
 
-Point operator+(const Point &p1, const Point &p2) {
-    return Point(p1.x + p2.x, p1.y + p2.y);
+Vector operator+(const Vector &p1, const Vector &p2) {
+    return Vector(p1.x + p2.x, p1.y + p2.y);
 }
 
-Point operator-(const Point &p1, const Point &p2) {
-    return Point(p1.x - p2.x, p1.y - p2.y);
+Vector operator-(const Vector &p1, const Vector &p2) {
+    return Vector(p1.x - p2.x, p1.y - p2.y);
 }
 
-Point operator*(const Point &p, double s) {
-    return Point(p.x * s, p.y * s);
+Vector operator*(const Vector &p, double s) {
+    return Vector(p.x * s, p.y * s);
 }
 
-Point operator*(double s, const Point &p) {
-    return Point(p.x * s, p.y * s);
+Vector operator*(double s, const Vector &p) {
+    return Vector(p.x * s, p.y * s);
 }
 
 double distance(double x1, double y1, double x2, double y2) {
@@ -72,18 +75,18 @@ void sampleData(PlayerCc::RangerProxy &rp, double rd[]) {
     }
 }
 
-Point laserToPoint(int i, double d) {
-    double inc = 4.0 * PI / 3 / SAMPLE_POINTS;
-    double ang = (i + 0.5) * inc - 2.0 * PI / 3;
-    return Point(cos(ang) * d, sin(ang) * d);
+Vector laserToVector(RangerData r) {
+    return Vector(cos(r.a) * r.d, sin(r.a) * r.d);
 }
 
-vector< pair<double,int> > localMinima(double rd[]) {
-    pair<double,int> last(rd[0], 0);
+vector<RangerData> localMinima(double rd[]) {
+    double inc = 4.0 * PI / 3 / SAMPLE_POINTS;
+    double ang = (0.5) * inc - 2.0 * PI / 3;
+    RangerData last = {rd[0], ang};
     bool newMin = true;
-    vector< pair<double,int> > localMins;
+    vector<RangerData> localMins;
     for (int i = 1; i < SAMPLE_POINTS; i++) {
-        if (rd[i] > last.first) {
+        if (rd[i] > last.d) {
             if (newMin) {
                 localMins.push_back(last);
                 newMin = false;
@@ -91,7 +94,9 @@ vector< pair<double,int> > localMinima(double rd[]) {
         } else {
             newMin = true;
         }
-        last = pair<double,int>(rd[i], i);
+        ang = (i + 0.5) * inc - 2.0 * PI / 3;
+        RangerData newLast = {rd[i], ang};
+        last = newLast;
     }
     if (newMin) localMins.push_back(last);
     return localMins;
@@ -151,30 +156,30 @@ int main(int argc, char *argv[]) {
             }
         }
         
-        const double Kg = 3.0;
-        const double Ko = 7.0;
+        const double Kg = 5.0;
+        const double Ko = 3.0;
         
         sampleData(rp, rangerData);
-        vector< pair<double,int> > objects = localMinima(rangerData);
-        Point v = Point(xt - x, yt - y).rotate(a);
+        vector<RangerData> objects = localMinima(rangerData);
+        Vector v = Vector(xt - x, yt - y).rotate(a);
         cout << endl;
-        cout << v << endl;
+        // cout << v << endl;
         v = v * (Kg / v.d());
-        cout << v << endl;
+        // cout << v << endl;
         for (int i = 0; i < objects.size(); i++) {
-            if (objects[i].first > 0) {
-                cout << objects[i].first << " | " << objects[i].second << endl;
-                Point o = laserToPoint(objects[i].second, objects[i].first);
-                cout << o << " -> ";
-                o = o * (Ko / pow(o.d(), 3));
+            if (objects[i].d > 0 && abs(objects[i].a) < PI / 2) {
+                // cout << objects[i].d << " | " << objects[i].a << endl;
+                Vector o = laserToVector(objects[i]);
                 cout << o << endl;
+                o = o * (Ko / pow(o.d(), 3));
+                // cout << o << endl;
                 v = v - o;
             }
         }
         cout << v << endl;
         
         double speed = 0;
-        double turn = v.a() / 5;
+        double turn = v.a() / 2;
         cout << turn << endl;
         cout << v.d() << endl;
         
