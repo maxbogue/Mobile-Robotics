@@ -10,6 +10,8 @@ const double MIN_DISTANCE = 0.02;
 const int SAMPLE_POINTS = 40;
 const int SAMPLE_SIZE = 681 / SAMPLE_POINTS;
 
+bool gIsLaser;
+
 class Vector {
 public:
     double x, y;
@@ -80,12 +82,15 @@ Vector laserToVector(RangerData r) {
 }
 
 vector<RangerData> localMinima(double rd[]) {
-    double inc = 4.0 * PI / 3 / SAMPLE_POINTS;
-    double ang = (0.5) * inc - 2.0 * PI / 3;
+    int numPoints = gIsLaser ? SAMPLE_POINTS : 8;
+    double span = gIsLaser ? 4.0 * PI / 3 : PI / 2;
+        
+    double inc = span / numPoints;
+    double ang = (0.5) * inc - span / 2;
     RangerData last = {rd[0], ang};
     bool newMin = true;
     vector<RangerData> localMins;
-    for (int i = 1; i < SAMPLE_POINTS; i++) {
+    for (int i = 1; i < numPoints; i++) {
         if (rd[i] > last.d) {
             if (newMin) {
                 localMins.push_back(last);
@@ -105,22 +110,43 @@ vector<RangerData> localMinima(double rd[]) {
 int main(int argc, char *argv[]) {
     
     char* host = "localhost";
-    int port = 9001;
+    int port = 6665;
     
-    if (argc > 2) {
-        host = argv[2];
-        port = atoi(argv[3]);
+    if (!strcmp(argv[1], "laser")) {
+        gIsLaser = true;
+    } else if (!strcmp(argv[1], "sonar")) {
+        gIsLaser = false;
+    } else {
+        cout << "Invalid option for device: " << argv[1] << "." << endl;
+        return 1;
+    }
+    
+    if (argc > 3) {
+        host = argv[3];
+        port = atoi(argv[4]);
     }
     
     PlayerCc::PlayerClient    robot(host, port);
-    PlayerCc::RangerProxy     rp(&robot, 0);
+    PlayerCc::RangerProxy     rp = NULL; //(&robot, 0);
+    PlayerCc::SonarProxy      sp = NULL; //(&robot, 0);
+    
+    if (gIsLaser) {
+        PlayerCc::RangerProxy rpInit(&robot, 0);
+        rp = rpInit;
+    } else {
+        // sp = PlayerCc::SonarProxy(&robot, 0);
+    }
+    // PlayerCc::RangerProxy     rp(&robot, 0);
+    // 
+    cout << rp << endl;
+    
     PlayerCc::Position2dProxy pp(&robot, 0);
     
     cout << "Instantiated proxies." << endl;
     
-    ifstream ifs(argv[1]);
+    ifstream ifs(argv[2]);
     if (!ifs.is_open()) {
-        cout << "Waypoint file \"" << argv[1]
+        cout << "Waypoint file \"" << argv[2]
              << "\" not found." << endl;
         return 1;
     }
@@ -131,7 +157,7 @@ int main(int argc, char *argv[]) {
     
     cout << "First waypoint: " << xt << ", " << yt << endl;
     
-    double rangerData[SAMPLE_POINTS];
+    double rangerData[gIsLaser ? SAMPLE_POINTS : 8];
     
     for (;;) {
         
@@ -155,11 +181,17 @@ int main(int argc, char *argv[]) {
                 break;
             }
         }
-        
         const double Kg = 5.0;
         const double Ko = 3.0;
         
-        sampleData(rp, rangerData);
+        if (gIsLaser) {
+            sampleData(rp, rangerData);
+        } else {
+            for (int i = 0; i < 8; i++) {
+                rangerData[i] = sp[7 - i];
+            }
+        }
+        
         vector<RangerData> objects = localMinima(rangerData);
         Vector v = Vector(xt - x, yt - y).rotate(a);
         cout << endl;
@@ -167,11 +199,11 @@ int main(int argc, char *argv[]) {
         v = v * (Kg / v.d());
         // cout << v << endl;
         for (int i = 0; i < objects.size(); i++) {
-            if (objects[i].d > 0 && abs(objects[i].a) < PI / 2) {
+            if (objects[i].d > 0.0001 && objects[i].d < 3 && abs(objects[i].a) < PI / 2) {
                 // cout << objects[i].d << " | " << objects[i].a << endl;
                 Vector o = laserToVector(objects[i]);
                 cout << o << endl;
-                o = o * (Ko / pow(o.d(), 3));
+                o = o * (Ko / pow(o.d(), 2));
                 // cout << o << endl;
                 v = v - o;
             }
