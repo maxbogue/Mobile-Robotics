@@ -1,0 +1,17 @@
+Mobile Robotics Homework 3B
+Max Bogue and Mike Tesch
+
+We conducted the goto tests using both of our implementations.  For each of
+us, the robot would come back to within roughly 6 inches of its original
+position each time around the square.  However, the square it traversed
+seemed to be slightly skewed; that is, it would turn slightly initially,
+then move in a square from there.  This may have been due to the robot
+incorrectly initializing its position, or something akin to that.
+
+For the obstacle avoidance tests we used Mike's code, as Max’s was not fully
+functional with sonar.  The test was reliably successful when the robot had
+to go around the corner to the left, but not to the right (apparently
+negative angles aren’t handled correctly).  The behavior was tentative,
+alternating between moving forward slightly and adjusting the angle as it
+went around the corner.  This behavior could likely be improved by allowing
+the robot to move slightly faster as it turns.
