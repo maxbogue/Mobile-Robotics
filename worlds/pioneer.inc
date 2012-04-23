@@ -116,6 +116,36 @@ define p3at_sonar ranger
   ssize [0.01 0.04]
 )
 
+define pioneer_RIT pioneer_RIT_base
+(
+  # actual size
+  size [0.44 0.38 0.22] # sizes from MobileRobots' web site
+
+  # the pioneer's center of rotation is offset from its center of area
+  origin [-0.04 0 0 0]
+
+  p2dx_sonar_front( pose [0 0 -0.03 0] ) 
+)
+  
+
+define pioneer_RIT_base position
+(
+  color "red"			# Default color.
+  drive "diff"		 	# Differential steering model.
+  gui_nose 1                  	# Draw a nose on the robot so we can see which way it points
+  obstacle_return 1           	# Can hit things.
+  laser_return 1                 # reflects laser beams
+  ranger_return 1             	# reflects sonar beams
+  blob_return 1               	# Seen by blobfinders  
+  fiducial_return 1           	# Seen as "1" fiducial finders
+
+  # alternative odometric localization with simple error model
+  localization "odom"         		# Change to "gps" to have impossibly perfect, global odometry
+  #  odom_error [ 0.05 0.05 0.1 ]   	# Odometry error or slip in X, Y and Theta
+                                   	# (Uniform random distribution)   
+)
+
+
 define pioneer_base position 
 (
   color "red"			# Default color.
