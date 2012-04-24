@@ -77,14 +77,6 @@ double toProb(double odds) {
     return odds / (odds + 1);
 }
 
-double piecewise(double x, double d) {
-    if (x < d - 5) {
-        return 0.5;
-    } else {
-        return 15;
-    }
-}
-
 void* robotLoop(void* args) {
     PlayerCc::SonarProxy sp = *pSonar;
     for (int i = 0; i < WIN_X; i++) {
@@ -116,26 +108,32 @@ void* robotLoop(void* args) {
         // including presumably updating your map somehow
         for (int s = 0; s < 8; s++) {
             double sd = sp[s] * 100;
-            if (sd < 500.0) {
-                // Sonar positions in cm and angle in rads.
-                double sx = rx + SONAR[s][0] * cos(ra) - SONAR[s][1] * sin(ra);
-                double sy = ry + SONAR[s][0] * sin(ra) + SONAR[s][1] * cos(ra);
-                double sa = ra + SONAR[s][2];
+            // Sonar positions in cm and angle in rads.
+            double sx = rx + SONAR[s][0] * cos(ra) - SONAR[s][1] * sin(ra);
+            double sy = ry + SONAR[s][0] * sin(ra) + SONAR[s][1] * cos(ra);
+            double sa = ra + SONAR[s][2];
 
-                for (double d = 0; d < sd + 10; d += BLOCK * 1.5) {
-                    double bInc = BLOCK / (double)d;
-                    for (double b = -PI / 12; b <= PI / 12; b += bInc) {
-                        double a = sa + b;
-                        int x = (int)(sx + d * cos(a)) / BLOCK;
-                        int y = (int)(sy + d * sin(a)) / BLOCK;
-                        cout << x << ", " << y << endl;
-                        cout << b << endl;
-                        cout << abs(b) << endl;
-                        cout << abs(b) * 6 / PI << endl;
-                        double u = pow(piecewise(d, sd), 1 - abs(b) / (PI / 12));
-                        cout << u << endl;
+            for (double d = 0; d < sd + 10; d += BLOCK * 1.5) {
+                double p;
+                if (sd >= 500 || d < sd - 10) {
+                    p = 0.4;
+                } else {
+                    p = 3;
+                }
+                // Math that seems to work well, despite the strange result:
+                //   arcLength = 2 * d * pi / 12 = d * pi / 6
+                //   numPoints = arcLength / BLOCK (roughly)
+                //   radsPerPoint = arc / numPoints
+                //     = (pi / 6) / (d * pi / 6 / BLOCK)
+                //     = BLOCK / d
+                double bInc = BLOCK / d;
+                for (double b = -PI / 12; b <= PI / 12; b += bInc) {
+                    double a = sa + b;
+                    int x = (int)(sx + d * cos(a)) / BLOCK;
+                    int y = (int)(sy + d * sin(a)) / BLOCK;
+                    if (x >= 0 && x < WIN_X && y >= 0 && y < WIN_Y) {
+                        double u = pow(p, 1 - abs(b) / (PI / 12));
                         double o = oddsMap[x][y] * u;
-                        cout << o << endl;
                         oddsMap[x][y] = o;
                         localMap[x][y] = toProb(o);
                     }
