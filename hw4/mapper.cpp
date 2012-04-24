@@ -77,7 +77,6 @@ double toProb(double odds) {
 }
 
 void* robotLoop(void* args) {
-    PlayerCc::SonarProxy sp = *pSonar;
     for (int i = 0; i < WIN_X; i++) {
         for (int j = 0; j < WIN_Y; j++) {
             localMap[i][j] = 0.5;
@@ -106,7 +105,7 @@ void* robotLoop(void* args) {
         // Here is where you do your robot stuff
         // including presumably updating your map somehow
         for (int s = 0; s < 8; s++) {
-            double sd = sp[s] * 100;
+            double sd = (*pSonar)[s] * 100;
             // Sonar positions in cm and angle in rads.
             double sx = rx + SONAR[s][0] * cos(ra) - SONAR[s][1] * sin(ra);
             double sy = ry + SONAR[s][0] * sin(ra) + SONAR[s][1] * cos(ra);
