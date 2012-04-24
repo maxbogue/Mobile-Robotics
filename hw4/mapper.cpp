@@ -170,6 +170,7 @@ int main(int argc, char *argv[]) {
 
     // Callbacks
     glutDisplayFunc(display);
+    glutIdleFunc(redisplay);
 
     glutMainLoop();
 
