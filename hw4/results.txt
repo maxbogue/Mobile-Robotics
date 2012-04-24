@@ -1,0 +1,20 @@
+Mobile Robot Programming, Homework 4
+Max Bogue
+
+My system worked decently.  In simulation, I was able to create a
+pretty accurate map (simulation.png).  Using the same code, I got an
+almost-recognizable map of the hallway circuit around the lab in GCCIS
+(gccis.png).  However, the simulation map was created over several
+minutes of wandering the same area.
+
+Upon inspection of a simulation run in real-time, I've noticed that the
+code handles close walls extremely poorly.  My theory is that the
+exponential function I'm using falls off too quickly for many pixels to be
+drawn, thus the walls appear to be ignored.  Sadly I'm out of time to play
+with it before the deadline for this assignment, but I plan to try
+modifying that function somehow to account for d.
+
+Overall, I was pleased with the result.  I think my reality map would have
+been improved with a tweak in my current code: for some reason I was using
+15 as the object odds when near the detected object; I've dropped this to
+3 and I believe that would have removed much of the excess noise.
