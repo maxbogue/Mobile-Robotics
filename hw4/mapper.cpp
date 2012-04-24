@@ -13,8 +13,7 @@ using namespace std;
 #define WIN_X 800
 #define WIN_Y 800
 
-//const double D = sqrt(512);
-const int BLOCK = 4;
+const int BLOCK = 8;
 
 const double PI = atan(1.0) * 4;
 const double SONAR[8][3] = {
@@ -113,7 +112,7 @@ void* robotLoop(void* args) {
             double sy = ry + SONAR[s][0] * sin(ra) + SONAR[s][1] * cos(ra);
             double sa = ra + SONAR[s][2];
 
-            for (double d = 0; d < sd + 10; d += BLOCK * 1.5) {
+            for (double d = 0; d <= sd + 10; d += BLOCK) {
                 double p;
                 if (sd >= 500 || d < sd - 10) {
                     p = 0.4;
@@ -132,7 +131,7 @@ void* robotLoop(void* args) {
                     int x = (int)(sx + d * cos(a)) / BLOCK;
                     int y = (int)(sy + d * sin(a)) / BLOCK;
                     if (x >= 0 && x < WIN_X && y >= 0 && y < WIN_Y) {
-                        double u = pow(p, 1 - abs(b) / (PI / 12));
+                        double u = pow(p, 1 - abs(b) * 12 / PI);
                         double o = oddsMap[x][y] * u;
                         oddsMap[x][y] = o;
                         localMap[x][y] = toProb(o);
@@ -159,8 +158,6 @@ int main(int argc, char *argv[]) {
 
     printf("player connected on port %d, proxies allocated\n", port);
     pPosition->SetMotorEnable(1);
-
-    //  pthread_mutex_init(&mut, NULL);
 
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, robotLoop, NULL);
