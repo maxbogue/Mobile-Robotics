@@ -127,7 +127,7 @@ void* robotLoop(void* args) {
                         cout << b << endl;
                         cout << abs(b) << endl;
                         cout << abs(b) * 6 / PI << endl;
-                        double u = pow(piecewise(d, sd), abs(b) / (PI / 6));
+                        double u = pow(piecewise(d, sd), 1 - abs(b) / (PI / 12));
                         cout << u << endl;
                         double o = oddsMap[x][y] * u;
                         cout << o << endl;
