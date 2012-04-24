@@ -117,8 +117,9 @@ void* robotLoop(void* args) {
                 double sy = ry + SONAR[s][0] * sin(ra) + SONAR[s][1] * cos(ra);
                 double sa = ra + SONAR[s][2];
 
-                for (int d = 10; d < sd + 10; d += BLOCK) {
-                    for (double b = -PI / 12; b <= PI / 12; b += PI / 48) {
+                for (double d = 0; d < sd + 10; d += BLOCK * 1.5) {
+                    double bInc = BLOCK / (double)d;
+                    for (double b = -PI / 12; b <= PI / 12; b += bInc) {
                         double a = sa + b;
                         int x = (int)(sx + d * cos(a)) / BLOCK;
                         int y = (int)(sy + d * sin(a)) / BLOCK;
