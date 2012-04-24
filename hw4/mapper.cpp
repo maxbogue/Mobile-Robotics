@@ -108,8 +108,8 @@ void* robotLoop(void* args) {
         }
 
         // Robot positions in cm, angle (yaw) in rads.
-        double rx = pPosition->GetXPos() * 100 + 400 * BLOCK;
-        double ry = pPosition->GetYPos() * 100 + 400 * BLOCK;
+        double rx = pPosition->GetXPos() * 100 + WIN_X / 2 * BLOCK;
+        double ry = pPosition->GetYPos() * 100 + WIN_Y / 2 * BLOCK;
         double ra = pPosition->GetYaw();
 
         // Here is where you do your robot stuff
