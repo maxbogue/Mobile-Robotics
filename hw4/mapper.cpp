@@ -100,7 +100,12 @@ void* robotLoop(void* args) {
         double turnrate, speed;
 
         // read from the proxies
-        pRobot->Read();
+        try {
+            pRobot->Read();
+        } catch (PlayerCc::PlayerError e) {
+            cout << e << endl;
+            continue;
+        }
 
         // Robot positions in cm, angle (yaw) in rads.
         double rx = pPosition->GetXPos() * 100 + 400 * BLOCK;
