@@ -1,0 +1,99 @@
+# Desc: 8 pioneer robots with laser and sonar in Golisano
+# zjb Spring 2012
+
+# defines Pioneer-like robots
+include "pioneer.inc"
+
+# defines 'map' object used for floorplans
+include "map.inc"
+
+# defines hokuyo laser
+include "hokuyo.inc"
+
+# size of the world in meters
+size [132 46.2]
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+
+# configure the GUI window
+window
+(
+  size [ 1000 350 ]
+  center [0 0]
+  scale 7.576
+)
+
+# load an environment bitmap
+floorplan
+(
+  bitmap "bitmaps/golisano2012.png"
+  size [132 46.2 2.0]
+  name "golisano"
+)
+
+# create a robot
+pioneer_RIT
+(
+  name "robot1"
+  pose [8.5 -7 0 90]
+  hokuyolaser( fov 240.0 samples 681 )
+)
+
+# create a robot
+pioneer_RIT
+(
+  name "robot2"
+  pose [-3 -9.8 0 180]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "yellow"
+)
+ 
+# create a robot
+pioneer_RIT
+(
+  name "robot3"
+  pose [-43 -9.8 0 0]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "green"
+)
+# create a robot
+pioneer_RIT
+(
+  name "robot4"
+  pose [-27 13.1 0 0]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "blue"
+)
+# create a robot
+pioneer_RIT
+(
+  name "robot5"
+  pose [-11.7 13.1 0 270]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "cyan"
+)
+# create a robot
+pioneer_RIT
+(
+  name "robot6"
+  pose [21 9.5 0 90]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "black"
+)
+# create a robot
+pioneer_RIT
+(
+  name "robot7"
+  pose [27 13.3 0 270]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "brown"
+)
+# create a robot
+pioneer_RIT
+(
+  name "robot8"
+  pose [8.5 3.5 0 90]
+  hokuyolaser( fov 240.0 samples 681 )
+  color "grey"
+)

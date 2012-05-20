@@ -21,14 +21,14 @@ window
 (
   size [ 591.000 638.000 ]
   center [-0.010 -0.040]
-  scale 35.7
+  scale 35.700
 )
 
 # load an environment bitmap
 floorplan
 (
   bitmap "bitmaps/cave.png"
-  size [16 16 0.8]
+  size [16.000 16.000 0.800]
   name "cave"
 )
 
@@ -36,7 +36,7 @@ floorplan
 pioneer2dx_base_front_sonar
 (
   name "robot1"
-  pose [-7 2 0 45]
+  pose [-7.000 2.000 0 45.000]
   hokuyolaser( fov 240.0 samples 681 )
 #  ctrl "wander"
 )
@@ -45,7 +45,7 @@ pioneer2dx_base_front_sonar
 pioneer2dx_base_front_sonar
 (
   name "robot2"
-  pose [3 -6 0 135]
+  pose [-7.089 -6.084 0 86.299]
   hokuyolaser( fov 240.0 samples 681 )
   ctrl "wander"
 )
