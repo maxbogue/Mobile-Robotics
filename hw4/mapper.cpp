@@ -3,7 +3,7 @@
 //   Player/Stage example code.
 // Not guaranteed to be decent code style but seems to work OK.
 
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <libplayerc++/playerc++.h>
 #include <pthread.h>
 #include <cmath>
